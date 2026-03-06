@@ -2,14 +2,14 @@ import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 
 // Your web app's Firebase configuration
-// Replace the placeholders with your actual Firebase config
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyB-G7_DKrxKT2whAFfxf3rGBdiIhmy05lI",
+  authDomain: "controle-de-estoque-63df7.firebaseapp.com",
+  projectId: "controle-de-estoque-63df7",
+  storageBucket: "controle-de-estoque-63df7.firebasestorage.app",
+  messagingSenderId: "857561362219",
+  appId: "1:857561362219:web:d013a2648efe9cdde69f6e",
+  measurementId: "G-JVJ6KPQ3BK"
 };
 
 // Initialize Firebase
