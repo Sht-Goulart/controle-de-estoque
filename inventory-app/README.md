@@ -20,13 +20,34 @@ O erro **"The database (default) does not exist"** ocorre porque o banco de dado
 
 1.  No console do Firebase, no menu lateral, clique em **Firestore Database**.
 2.  Clique em **Criar banco de dados**.
-3.  Escolha o modo (Teste ou Produção - em produção, lembre-se de configurar as regras de segurança).
+3.  Escolha o modo (Teste ou Produção).
 4.  Selecione o local do servidor (ex: `southamerica-east1` para o Brasil).
 5.  Clique em **Ativar**.
 
 Se preferir fazer pelo Google Cloud Console, use este link: [Configuração do Firestore](https://console.cloud.google.com/datastore/setup).
 
-### 3. Estrutura do Banco de Dados
+### 3. Configurar Regras de Segurança (IMPORTANTE)
+
+Se você não conseguir adicionar produtos ou pedidos (erro de "permissão negada"), você precisa ajustar as Regras de Segurança:
+
+1.  No Console do Firebase, vá em **Firestore Database** > aba **Regras**.
+2.  Para fins de teste e desenvolvimento inicial, você pode usar estas regras (permite leitura e escrita por qualquer pessoa por um tempo limitado):
+
+```
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if true;
+    }
+  }
+}
+```
+
+3.  Clique em **Publicar**.
+4.  *Nota: Para um aplicativo em produção, você deve restringir o acesso apenas a usuários autenticados.*
+
+### 4. Estrutura do Banco de Dados
 
 O aplicativo criará automaticamente as coleções `products` e `orders` assim que você começar a adicionar itens, mas você pode criá-las manualmente se desejar.
 

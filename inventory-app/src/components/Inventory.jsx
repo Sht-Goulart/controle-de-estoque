@@ -13,13 +13,22 @@ const Inventory = () => {
     const unsubscribe = onSnapshot(collection(db, 'products'), (snapshot) => {
       const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       setProducts(items);
+    }, (error) => {
+      console.error("Erro ao carregar produtos: ", error);
+      if (error.code === 'permission-denied') {
+        alert("Erro: Permissão negada ao ler produtos. Verifique as Regras de Segurança do Firestore.");
+      }
     });
     return () => unsubscribe();
   }, []);
 
   const handleAddProduct = async (e) => {
     e.preventDefault();
-    if (!newItem.name || !newItem.price || !newItem.stock) return;
+    if (!newItem.name || !newItem.price || !newItem.stock) {
+      alert("Por favor, preencha nome, preço e estoque inicial.");
+      return;
+    }
+
     try {
       await addDoc(collection(db, 'products'), {
         name: newItem.name,
@@ -29,8 +38,16 @@ const Inventory = () => {
         createdAt: new Date()
       });
       setNewItem({ name: '', price: '', stock: '', description: '' });
+      alert("Produto adicionado com sucesso!");
     } catch (error) {
       console.error("Error adding product: ", error);
+      if (error.code === 'permission-denied') {
+        alert("Erro: Você não tem permissão para adicionar produtos. Verifique as Regras de Segurança do Firestore no Console do Firebase.");
+      } else if (error.message.includes('database (default) does not exist')) {
+        alert("Erro: O banco de dados Firestore não foi inicializado. Consulte o README.");
+      } else {
+        alert("Erro ao adicionar produto: " + error.message);
+      }
     }
   };
 
@@ -44,8 +61,10 @@ const Inventory = () => {
         description: editItem.description
       });
       setIsEditing(null);
+      alert("Produto atualizado!");
     } catch (error) {
       console.error("Error updating product: ", error);
+      alert("Erro ao atualizar produto: " + error.message);
     }
   };
 
@@ -55,6 +74,7 @@ const Inventory = () => {
         await deleteDoc(doc(db, 'products', id));
       } catch (error) {
         console.error("Error deleting product: ", error);
+        alert("Erro ao excluir produto: " + error.message);
       }
     }
   };
@@ -130,7 +150,9 @@ const Inventory = () => {
             </tr>
           </thead>
           <tbody>
-            {products.map((product) => (
+            {products.length === 0 ? (
+              <tr><td colSpan="5" style={{ textAlign: 'center' }}>Nenhum produto cadastrado.</td></tr>
+            ) : products.map((product) => (
               <tr key={product.id}>
                 {isEditing === product.id ? (
                   <>
