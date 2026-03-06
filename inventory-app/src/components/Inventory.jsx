@@ -14,9 +14,11 @@ const Inventory = () => {
       const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       setProducts(items);
     }, (error) => {
-      console.error("Erro ao carregar produtos: ", error);
+      console.error("Erro detalhado no Firestore (onSnapshot):", error);
       if (error.code === 'permission-denied') {
-        alert("Erro: Permissão negada ao ler produtos. Verifique as Regras de Segurança do Firestore.");
+        alert("Erro: Permissão negada ao ler produtos. Verifique as Regras de Segurança.");
+      } else if (error.message.includes('database (default) does not exist')) {
+        alert("Erro: Banco de dados não encontrado. Certifique-se de que o Firestore foi criado no console do Firebase.");
       }
     });
     return () => unsubscribe();
@@ -30,23 +32,25 @@ const Inventory = () => {
     }
 
     try {
-      await addDoc(collection(db, 'products'), {
+      console.log("Tentando adicionar produto ao Firestore...");
+      const docRef = await addDoc(collection(db, 'products'), {
         name: newItem.name,
         price: parseFloat(newItem.price),
         stock: parseInt(newItem.stock),
         description: newItem.description,
         createdAt: new Date()
       });
+      console.log("Produto adicionado com ID:", docRef.id);
       setNewItem({ name: '', price: '', stock: '', description: '' });
       alert("Produto adicionado com sucesso!");
     } catch (error) {
-      console.error("Error adding product: ", error);
+      console.error("Erro detalhado ao adicionar produto:", error);
       if (error.code === 'permission-denied') {
-        alert("Erro: Você não tem permissão para adicionar produtos. Verifique as Regras de Segurança do Firestore no Console do Firebase.");
+        alert("Erro: Permissão negada. Verifique as Regras de Segurança no Console.");
       } else if (error.message.includes('database (default) does not exist')) {
-        alert("Erro: O banco de dados Firestore não foi inicializado. Consulte o README.");
+        alert("Erro Crítico: O banco de dados Firestore não foi inicializado no seu projeto. Vá ao Console > Firestore e clique em 'Criar banco de dados'.");
       } else {
-        alert("Erro ao adicionar produto: " + error.message);
+        alert("Erro ao adicionar produto: " + error.message + "\nCódigo: " + error.code);
       }
     }
   };
@@ -63,8 +67,8 @@ const Inventory = () => {
       setIsEditing(null);
       alert("Produto atualizado!");
     } catch (error) {
-      console.error("Error updating product: ", error);
-      alert("Erro ao atualizar produto: " + error.message);
+      console.error("Erro detalhado ao atualizar:", error);
+      alert("Erro ao atualizar: " + error.message);
     }
   };
 
@@ -73,8 +77,8 @@ const Inventory = () => {
       try {
         await deleteDoc(doc(db, 'products', id));
       } catch (error) {
-        console.error("Error deleting product: ", error);
-        alert("Erro ao excluir produto: " + error.message);
+        console.error("Erro detalhado ao excluir:", error);
+        alert("Erro ao excluir: " + error.message);
       }
     }
   };
@@ -151,7 +155,7 @@ const Inventory = () => {
           </thead>
           <tbody>
             {products.length === 0 ? (
-              <tr><td colSpan="5" style={{ textAlign: 'center' }}>Nenhum produto cadastrado.</td></tr>
+              <tr><td colSpan="5" style={{ textAlign: 'center' }}>Nenhum produto cadastrado no banco de dados.</td></tr>
             ) : products.map((product) => (
               <tr key={product.id}>
                 {isEditing === product.id ? (

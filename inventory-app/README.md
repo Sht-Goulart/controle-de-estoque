@@ -16,22 +16,18 @@ Este aplicativo requer um projeto no Firebase. Siga estas etapas:
 
 ### 2. Configurar o Banco de Dados Firestore
 
-O erro **"The database (default) does not exist"** ocorre porque o banco de dados Firestore ainda não foi inicializado no seu projeto.
-
 1.  No console do Firebase, no menu lateral, clique em **Firestore Database**.
 2.  Clique em **Criar banco de dados**.
 3.  Escolha o modo (Teste ou Produção).
 4.  Selecione o local do servidor (ex: `southamerica-east1` para o Brasil).
 5.  Clique em **Ativar**.
 
-Se preferir fazer pelo Google Cloud Console, use este link: [Configuração do Firestore](https://console.cloud.google.com/datastore/setup).
-
 ### 3. Configurar Regras de Segurança (IMPORTANTE)
 
-Se você não conseguir adicionar produtos ou pedidos (erro de "permissão negada"), você precisa ajustar as Regras de Segurança:
+Se você receber o erro **"permission-denied"**, ajuste as Regras:
 
 1.  No Console do Firebase, vá em **Firestore Database** > aba **Regras**.
-2.  Para fins de teste e desenvolvimento inicial, você pode usar estas regras (permite leitura e escrita por qualquer pessoa por um tempo limitado):
+2.  Use estas regras para permitir acesso total durante o desenvolvimento:
 
 ```
 rules_version = '2';
@@ -45,11 +41,21 @@ service cloud.firestore {
 ```
 
 3.  Clique em **Publicar**.
-4.  *Nota: Para um aplicativo em produção, você deve restringir o acesso apenas a usuários autenticados.*
 
-### 4. Estrutura do Banco de Dados
+## 🔍 Solução de Problemas Comuns
 
-O aplicativo criará automaticamente as coleções `products` e `orders` assim que você começar a adicionar itens, mas você pode criá-las manualmente se desejar.
+### "The database (default) does not exist"
+Isso significa que você ainda não clicou no botão "Criar banco de dados" dentro da seção Firestore no Console do Firebase, ou o projeto selecionado no console é diferente do `projectId` no seu código.
+- Verifique se o `projectId` no cabeçalho do aplicativo (no navegador) corresponde ao ID do projeto no seu console.
+- Certifique-se de que o Firestore está no **"Modo Nativo"** (Native Mode), e não no modo Datastore.
+
+### "Produtos não aparecem no banco, mas aparecem na aba de pedidos"
+Isso acontece se o estado do React está sendo atualizado localmente mas a gravação no banco está falhando.
+- Verifique o Console do Desenvolvedor no navegador (F12) para ver mensagens de erro detalhadas.
+- Verifique se as Regras de Segurança foram publicadas com sucesso.
+
+### "Firestore: Operation was rejected"
+Geralmente indica que os dados não seguem as Regras de Segurança ou que as regras ainda não foram propagadas (pode levar até 1 minuto).
 
 ## 🛠️ Instalação e Execução
 
@@ -59,15 +65,4 @@ npm install
 
 # Iniciar o servidor de desenvolvimento
 npm run dev
-
-# Gerar o build para produção
-npm run build
 ```
-
-## ✨ Funcionalidades
-
-- **Gerenciamento de Estoque:** Adicione, edite e exclua produtos com controle de quantidade.
-- **Sistema de Pedidos:** Carrinho de compras dinâmico com seleção de produtos.
-- **Baixa Automática:** O estoque é atualizado automaticamente via transações do Firestore ao confirmar um pedido.
-- **Painel do Estoquista:** Visualização exclusiva para gerenciamento de status de entrega e pagamento.
-- **Data de Pagamento:** Controle de quando os pedidos devem ser pagos.
