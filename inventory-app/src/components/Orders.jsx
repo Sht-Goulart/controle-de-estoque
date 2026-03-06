@@ -8,6 +8,7 @@ const Orders = () => {
   const [orders, setOrders] = useState([]);
   const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [paymentDate, setPaymentDate] = useState('');
 
   useEffect(() => {
     const unsubProducts = onSnapshot(collection(db, 'products'), (snapshot) => {
@@ -56,6 +57,10 @@ const Orders = () => {
 
   const handlePlaceOrder = async () => {
     if (cart.length === 0) return;
+    if (!paymentDate) {
+      alert('Por favor, selecione uma data de pagamento.');
+      return;
+    }
     setLoading(true);
 
     try {
@@ -90,17 +95,16 @@ const Orders = () => {
           })),
           total: calculateTotal(),
           createdAt: new Date(),
-          status: 'Confirmado'
+          paymentDate: paymentDate,
+          status: 'Entrega pendente'
         };
 
         const ordersRef = collection(db, 'orders');
-        // Note: transaction.set or similar can be used if we had a predefined ID,
-        // but here we just add to the collection. In Firestore transactions,
-        // you can use transaction.set(doc(ordersRef), orderData)
         transaction.set(doc(ordersRef), orderData);
       });
 
       setCart([]);
+      setPaymentDate('');
       alert('Pedido realizado com sucesso!');
     } catch (error) {
       console.error("Erro ao realizar pedido: ", error);
@@ -125,6 +129,15 @@ const Orders = () => {
                 </option>
               ))}
             </select>
+          </div>
+
+          <div className="form-group">
+            <label>Data de Pagamento</label>
+            <input
+              type="date"
+              value={paymentDate}
+              onChange={(e) => setPaymentDate(e.target.value)}
+            />
           </div>
 
           <div className="cart">
@@ -177,16 +190,24 @@ const Orders = () => {
 
       <div className="order-history">
         <div className="card">
-          <h3>Histórico de Pedidos</h3>
+          <h3>Histórico de Pedidos (Visualização do Cliente)</h3>
           <div style={{ maxHeight: '600px', overflowY: 'auto' }}>
             {orders.length === 0 ? <p>Nenhum pedido realizado</p> : orders.map(order => (
               <div key={order.id} style={{ borderBottom: '1px solid #444', padding: '10px 0' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <strong>Pedido #{order.id.substring(0, 5)}</strong>
-                  <span className="badge badge-success">{order.status}</span>
+                  <span className={`badge ${
+                    order.status === 'Entregue' ? 'badge-success' :
+                    order.status === 'Pagamento pendente' ? 'badge-warning' : 'badge-info'
+                  }`}>
+                    {order.status}
+                  </span>
                 </div>
                 <div style={{ fontSize: '0.9rem', color: '#888' }}>
-                  {order.createdAt?.toDate ? order.createdAt.toDate().toLocaleString() : 'Data desconhecida'}
+                  Criado em: {order.createdAt?.toDate ? order.createdAt.toDate().toLocaleString() : 'Data desconhecida'}
+                </div>
+                <div style={{ fontSize: '0.9rem', color: '#888' }}>
+                  Pagamento: {order.paymentDate}
                 </div>
                 <ul style={{ paddingLeft: '20px', margin: '5px 0' }}>
                   {order.items.map((item, idx) => (

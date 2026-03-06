@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import Inventory from './components/Inventory'
 import Orders from './components/Orders'
-import { Package, ShoppingCart } from 'lucide-react'
+import OrderAdmin from './components/OrderAdmin'
+import { Package, ShoppingCart, LayoutDashboard } from 'lucide-react'
 import './App.css'
 
 function App() {
@@ -26,11 +27,20 @@ function App() {
             <ShoppingCart size={20} style={{ marginRight: '8px', verticalAlign: 'middle' }} />
             Pedidos
           </button>
+          <button
+            className={activeTab === 'admin' ? 'active' : ''}
+            onClick={() => setActiveTab('admin')}
+          >
+            <LayoutDashboard size={20} style={{ marginRight: '8px', verticalAlign: 'middle' }} />
+            Painel do Estoquista
+          </button>
         </nav>
       </header>
 
       <main>
-        {activeTab === 'inventory' ? <Inventory /> : <Orders />}
+        {activeTab === 'inventory' && <Inventory />}
+        {activeTab === 'orders' && <Orders />}
+        {activeTab === 'admin' && <OrderAdmin />}
       </main>
     </div>
   )
