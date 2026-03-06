@@ -13,11 +13,18 @@ const Orders = () => {
   useEffect(() => {
     const unsubProducts = onSnapshot(collection(db, 'products'), (snapshot) => {
       setProducts(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    }, (error) => {
+        console.error("Erro ao carregar produtos: ", error);
+        if (error.code === 'not-found') {
+            alert('Banco de dados Firestore não inicializado no Firebase.');
+        }
     });
 
     const q = query(collection(db, 'orders'), orderBy('createdAt', 'desc'));
     const unsubOrders = onSnapshot(q, (snapshot) => {
       setOrders(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    }, (error) => {
+        console.error("Erro ao carregar pedidos: ", error);
     });
 
     return () => {
@@ -108,7 +115,11 @@ const Orders = () => {
       alert('Pedido realizado com sucesso!');
     } catch (error) {
       console.error("Erro ao realizar pedido: ", error);
-      alert("Erro ao realizar pedido: " + error.message);
+      if (error.message.includes('database (default) does not exist')) {
+        alert("Erro: O banco de dados Firestore não foi inicializado no seu projeto Firebase. Consulte o README para instruções de configuração.");
+      } else {
+        alert("Erro ao realizar pedido: " + error.message);
+      }
     } finally {
       setLoading(false);
     }

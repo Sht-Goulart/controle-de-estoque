@@ -1,16 +1,52 @@
-# React + Vite
+# Gerenciador de Estoque Dinâmico com Firebase
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Este é um aplicativo de gerenciamento de estoque e pedidos construído com React, Vite e Firestore.
 
-Currently, two official plugins are available:
+## 🚀 Como começar
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### 1. Configurar o Firebase
 
-## React Compiler
+Este aplicativo requer um projeto no Firebase. Siga estas etapas:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+1.  Vá para o [Console do Firebase](https://console.firebase.google.com/).
+2.  Crie um novo projeto (ex: `controle-de-estoque`).
+3.  Adicione um aplicativo da web ao seu projeto.
+4.  Copie as credenciais do Firebase (`apiKey`, `authDomain`, `projectId`, etc.).
+5.  Abra o arquivo `src/firebase.js` no projeto e substitua os espaços reservados pelas suas credenciais reais.
 
-## Expanding the ESLint configuration
+### 2. Configurar o Banco de Dados Firestore
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+O erro **"The database (default) does not exist"** ocorre porque o banco de dados Firestore ainda não foi inicializado no seu projeto.
+
+1.  No console do Firebase, no menu lateral, clique em **Firestore Database**.
+2.  Clique em **Criar banco de dados**.
+3.  Escolha o modo (Teste ou Produção - em produção, lembre-se de configurar as regras de segurança).
+4.  Selecione o local do servidor (ex: `southamerica-east1` para o Brasil).
+5.  Clique em **Ativar**.
+
+Se preferir fazer pelo Google Cloud Console, use este link: [Configuração do Firestore](https://console.cloud.google.com/datastore/setup).
+
+### 3. Estrutura do Banco de Dados
+
+O aplicativo criará automaticamente as coleções `products` e `orders` assim que você começar a adicionar itens, mas você pode criá-las manualmente se desejar.
+
+## 🛠️ Instalação e Execução
+
+```bash
+# Instalar dependências
+npm install
+
+# Iniciar o servidor de desenvolvimento
+npm run dev
+
+# Gerar o build para produção
+npm run build
+```
+
+## ✨ Funcionalidades
+
+- **Gerenciamento de Estoque:** Adicione, edite e exclua produtos com controle de quantidade.
+- **Sistema de Pedidos:** Carrinho de compras dinâmico com seleção de produtos.
+- **Baixa Automática:** O estoque é atualizado automaticamente via transações do Firestore ao confirmar um pedido.
+- **Painel do Estoquista:** Visualização exclusiva para gerenciamento de status de entrega e pagamento.
+- **Data de Pagamento:** Controle de quando os pedidos devem ser pagos.
